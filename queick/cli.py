@@ -17,10 +17,12 @@ def main():
         action='store_true')
     parser.add_argument('-lf', '--log-filepath',
                         help='logfile to save all the worker log')
+    parser.add_argument('--max-workers', type=int, help='maximum number of workers to use')
     args = parser.parse_args()
 
     w = Worker()
     w.work(
         ping_host=args.ping_host,
         ping_port=args.ping_port,
-        debug=args.debug)
+        debug=args.debug,
+        max_workers=args.max_workers)

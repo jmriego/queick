@@ -57,6 +57,9 @@ class Job:
             raise err
         return self._create_func_with_error_handling(f)
 
+    def __lt__(self, other):
+        return self.priority < other.priority
+
     def perform(self) -> Future:
         return self._async_execute(self.func, self.args)
 

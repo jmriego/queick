@@ -1,4 +1,5 @@
 from multiprocessing import Process, Queue, Event
+from queue import PriorityQueue
 import socket
 import pickle
 import time
@@ -26,7 +27,8 @@ class Worker:
                               None] = 80,
              log_filepath: Union[str,
                                  None] = None,
-             debug: bool = False) -> None:
+             debug: bool = False,
+             max_workers: bool = None) -> None:
         loglevel = DEBUG if debug else INFO
         setup_logger(loglevel=loglevel, filepath=log_filepath)
         sys.path.append('.')
@@ -34,7 +36,7 @@ class Worker:
 
         try:
             event = Event()
-            qm = QueueManager(queue_class=Queue)
+            qm = QueueManager(queue_class=PriorityQueue)
             scheduler = Scheduler()
 
             jr = JobReceiver()
@@ -48,7 +50,7 @@ class Worker:
                 nw.port = ping_port
                 nw.start()
 
-            qm.watch(event, scheduler, nw)
+            qm.watch(event, scheduler, nw, max_workers)
 
         except KeyboardInterrupt:
             p.terminate()
