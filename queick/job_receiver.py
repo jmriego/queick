@@ -1,5 +1,5 @@
 import socket
-import pickle
+import json
 from logging import INFO, getLogger
 
 from .job import Job
@@ -22,14 +22,14 @@ class JobReceiver:
                 break
 
             try:
-                data = pickle.loads(data_bytes)
+                data = json.loads(data_bytes.decode('utf-8'))
                 qm.enqueue(Job.from_data(data))
                 logger.info('Job received -> data: %s, addr: %s', data, addr)
-                response = pickle.dumps({"success": True, "error": None})
+                response = json.dumps({"success": True, "error": None}).encode('utf-8')
                 conn.sendall(response)
                 event.set()
             except Exception as e:
                 logger.error(str(e))
-                response = pickle.dumps({"success": False, "error": str(e)})
+                response = json.dumps({"success": False, "error": str(e)}).encode('utf-8')
                 conn.sendall(response)
         conn.close()

@@ -1,5 +1,5 @@
 import socket
-import pickle
+import json
 from multiprocessing import Queue
 from concurrent.futures import ThreadPoolExecutor, wait, FIRST_COMPLETED
 from logging import getLogger

@@ -1,5 +1,5 @@
 import socket
-import pickle
+import json
 
 from .constants import RETRY_TYPE, TCP_SERVER_HOST, TCP_SERVER_PORT
 from .exceptions import WorkerNotFoundError
@@ -126,10 +126,10 @@ class JobQueue:
         try:
             s.connect((TCP_SERVER_HOST, TCP_SERVER_PORT))
             s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            s.sendall(pickle.dumps(payload))
+            s.sendall(json.dumps(payload).encode('utf-8'))
 
             msg = s.recv(1024)
-            return pickle.loads(msg), None
+            return json.loads(msg.decode('utf-8')), None
         except ConnectionRefusedError:
             self._print_client_error(
                 'Queick worker is not found. Make sure you launched queick.')
