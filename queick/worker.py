@@ -27,7 +27,9 @@ class Worker:
              log_filepath: Union[str,
                                  None] = None,
              debug: bool = False,
-             max_workers: bool = None) -> None:
+             max_workers: bool = None,
+             server_host: str = None,
+             server_port: int = None) -> None:
         loglevel = DEBUG if debug else INFO
         setup_logger(loglevel=loglevel, filepath=log_filepath)
         sys.path.append('.')
@@ -39,7 +41,7 @@ class Worker:
             scheduler = Scheduler()
 
             jr = JobReceiver()
-            p = Process(target=jr.listen, args=(event, qm,))
+            p = Process(target=jr.listen, args=(event, qm, server_host, server_port))
             p.start()
 
             nw = NetworkWatcher("", 0, queue_class=Queue)

@@ -10,9 +10,11 @@ logger = getLogger(__name__)
 
 class JobReceiver:
     # Start tcp server for listening new job arrival messages
-    def listen(self, event, qm) -> None:
+    def listen(self, event, qm, server_host=None, server_port=None) -> None:
+        server_host = TCP_SERVER_HOST if server_host is None else server_host
+        server_port = TCP_SERVER_PORT if server_port is None else server_port
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.bind((TCP_SERVER_HOST, TCP_SERVER_PORT))
+        s.bind((server_host, server_port))
         s.listen(1)
 
         while True:

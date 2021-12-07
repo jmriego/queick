@@ -10,6 +10,12 @@ from typing import Union, Tuple
 
 
 class JobQueue:
+    def __init__(self,
+                 server_host: str = None,
+                 server_port: int = None):
+        self.server_host = TCP_SERVER_HOST if server_host is None else server_host
+        self.server_port = TCP_SERVER_PORT if server_port is None else server_port
+
     def enqueue(self,
                 func: MethodType,
                 args: Union[tuple,
@@ -125,7 +131,7 @@ class JobQueue:
             self, payload: dict) -> Tuple[Union[dict, None], Union[None, WorkerNotFoundError]]:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
-            s.connect((TCP_SERVER_HOST, TCP_SERVER_PORT))
+            s.connect((self.server_host, self.server_port))
             s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             s.sendall(json.dumps(payload).encode('utf-8'))
 

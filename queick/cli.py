@@ -18,6 +18,8 @@ def main():
     parser.add_argument('-lf', '--log-filepath',
                         help='logfile to save all the worker log')
     parser.add_argument('--max-workers', type=int, help='maximum number of workers to use')
+    parser.add_argument('--server-host', type=str, help='host to listen from')
+    parser.add_argument('--server-port', type=int, help='port to listen from')
     args = parser.parse_args()
 
     w = Worker()
@@ -25,4 +27,6 @@ def main():
         ping_host=args.ping_host,
         ping_port=args.ping_port,
         debug=args.debug,
-        max_workers=args.max_workers)
+        max_workers=args.max_workers,
+        server_host=args.server_host,
+        server_port=args.server_port)
