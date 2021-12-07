@@ -1,5 +1,4 @@
 from multiprocessing import Process, Queue, Event
-from queue import PriorityQueue
 import socket
 import json
 import time

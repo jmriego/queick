@@ -104,11 +104,12 @@ class JobQueue:
         payload = {
             "func_name": func_name,
             "args": args,
+            "priority": priority,
             "retry": retry,
             "retry_interval": retry_interval,
-            "retry_type": retry_type,
             "max_retry_interval": max_retry_interval,
             "retry_on_network_available": retry_on_network_available,
+            "retry_type": retry_type,
             "max_workers": max_workers
         }
         if start_at:

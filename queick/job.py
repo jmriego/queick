@@ -49,6 +49,7 @@ class Job:
         return cls(
                    data['func_name'],
                    data['args'],
+                   priority=data['priority'],
                    retry=data['retry'],
                    retry_interval=data['retry_interval'],
                    retry_type=data['retry_type'],
@@ -82,7 +83,8 @@ class Job:
         return self.executor.submit(self.func, args)
 
     def terminate(self) -> None:
-        self.executor.shutdown(wait=False)
+        pass
+        # self.executor.shutdown(wait=False)
 
     def _create_func_with_error_handling(self, func: MethodType):
         def f(args):

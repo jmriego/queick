@@ -4,6 +4,7 @@ from multiprocessing import Queue
 from concurrent.futures import ThreadPoolExecutor, wait, FIRST_COMPLETED
 from logging import getLogger
 import os
+import time
 
 from .job import Job
 
@@ -31,13 +32,16 @@ class QueueManager:
     def watch(self, event, scheduler, nw, max_workers=None):
         max_workers = max_workers if max_workers else os.cpu_count()
         futures = set()
-        with ThreadPoolExecutor(max_workers=max_workers or os.cpu_count()) as executor:
-            event.wait()
-            while True:
-                if len(futures) >= max_workers:
-                    completed, futures = wait(futures, return_when=FIRST_COMPLETED)
+        event.wait()
+
+        while True:
+            with ThreadPoolExecutor(max_workers=max_workers) as executor:
+                time.sleep(5)
+                jobs = []
                 while self.is_empty() != True:
-                    job = self.dequeue()
+                    jobs.append(self.dequeue())
+
+                for job in sorted(jobs, key=lambda j: j.priority):
                     logger.debug('[QueueManager] Job is dequeued: %s', vars(job))
 
                     job.prepare(executor, scheduler, nw)
@@ -47,6 +51,8 @@ class QueueManager:
                         scheduler.put(job)
                         scheduler.run()
                     else:
+                        if len(futures) >= max_workers:
+                            completed, futures = wait(futures, return_when=FIRST_COMPLETED)
                         futures.add(job.perform())
 
                 event.clear()
