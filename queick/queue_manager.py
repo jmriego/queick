@@ -37,26 +37,13 @@ class QueueManager:
                 if len(futures) >= max_workers:
                     completed, futures = wait(futures, return_when=FIRST_COMPLETED)
                 while self.is_empty() != True:
-                    data = self.dequeue()
-                    logger.debug('[QueueManager] Job is dequeued: %s', data)
+                    job = self.dequeue()
+                    logger.debug('[QueueManager] Job is dequeued: %s', vars(job))
 
-                    job = self.create_job(
-                        data['func_name'],
-                        data['args'],
-                        executor,
-                        scheduler,
-                        nw,
-                        retry=data['retry'],
-                        retry_interval=data['retry_interval'],
-                        retry_type=data['retry_type'],
-                        retry_on_network_available=data['retry_on_network_available'])
+                    job.prepare(executor, scheduler, nw)
+
                     # Scheduled job by q.schedule_at()
-                    if 'start_at' in data:
-                        job.start_at = data['start_at']
-                        # Cron job by q.cron()
-                        if 'interval' in data:
-                            job.cron_interval = data['interval']
-                            job.cron = True
+                    if job.cron:
                         scheduler.put(job)
                         scheduler.run()
                     else:

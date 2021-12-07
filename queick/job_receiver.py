@@ -2,6 +2,7 @@ import socket
 import pickle
 from logging import INFO, getLogger
 
+from .job import Job
 from .constants import TCP_SERVER_HOST, TCP_SERVER_PORT
 
 logger = getLogger(__name__)
@@ -22,7 +23,7 @@ class JobReceiver:
 
             try:
                 data = pickle.loads(data_bytes)
-                qm.enqueue(data)
+                qm.enqueue(Job.from_data(data))
                 logger.info('Job received -> data: %s, addr: %s', data, addr)
                 response = pickle.dumps({"success": True, "error": None})
                 conn.sendall(response)

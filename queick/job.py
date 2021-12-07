@@ -18,33 +18,48 @@ class Job:
             self,
             func_name: str,
             args: tuple,
-            executor: ThreadPoolExecutor,
-            scheduler,
-            network_watcher,
-            start_at: float = time.time(),
+            start_at: float = None,
             priority: int = 1,
             retry: bool = False,
             retry_interval: int = 10,
             max_retry_interval: int = 3600,
             retry_on_network_available: bool = False,
-            retry_type=RETRY_TYPE.EXPONENTIAL):
+            retry_type=RETRY_TYPE.EXPONENTIAL,
+            cron_interval: int = 0):
         self.func_name = func_name
         self.args = args
-        self.scheduler = scheduler
         self.priority = priority
         self.retry = retry
         self.retry_interval = retry_interval
         self.max_retry_interval = max_retry_interval
         self.retry_type = retry_type
-        self.start_at = start_at
+        self.start_at = start_at or time.time()
         self.retry_on_network_available = retry_on_network_available
         self.retry_count = 0
-        self.executor = executor
         self._minimum_retry_interval = 1
 
-        self.cron = False
-        self.cron_interval = 0
+        if cron_interval:
+            self.cron_interval = cron_interval
+            self.cron = True
+        else:
+            self.cron = False
 
+    @classmethod
+    def from_data(cls, data):
+        return cls(
+                   data['func_name'],
+                   data['args'],
+                   retry=data['retry'],
+                   retry_interval=data['retry_interval'],
+                   retry_type=data['retry_type'],
+                   retry_on_network_available=data['retry_on_network_available'],
+                   start_at = data.get('start_at'),
+                   cron_interval = data.get('interval'),
+                   )
+
+    def prepare(self, executor, scheduler, network_watcher):
+        self.scheduler = scheduler
+        self.executor = executor
         self.network_watcher = network_watcher
 
     @property

@@ -36,7 +36,7 @@ class Worker:
 
         try:
             event = Event()
-            qm = QueueManager(queue_class=PriorityQueue)
+            qm = QueueManager(queue_class=Queue)
             scheduler = Scheduler()
 
             jr = JobReceiver()
