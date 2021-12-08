@@ -58,9 +58,8 @@ class Job:
                    cron_interval = data.get('interval'),
                    )
 
-    def prepare(self, executor, scheduler, network_watcher):
+    def prepare(self, scheduler, network_watcher):
         self.scheduler = scheduler
-        self.executor = executor
         self.network_watcher = network_watcher
 
     @property
@@ -76,15 +75,11 @@ class Job:
     def __lt__(self, other):
         return self.priority < other.priority
 
-    def perform(self) -> Future:
-        return self._async_execute(self.func, self.args)
-
-    def _async_execute(self, func, args) -> Future:
-        return self.executor.submit(self.func, args)
+    def perform(self, executor) -> Future:
+        return executor.submit(self.func, self.args)
 
     def terminate(self) -> None:
         pass
-        # self.executor.shutdown(wait=False)
 
     def _create_func_with_error_handling(self, func: MethodType):
         def f(args):
@@ -92,7 +87,7 @@ class Job:
                 if self.cron:
                     self._register_cron()
                 res = func(*args)
-                self.terminate()  # Terminate all idle threads
+                self.terminate()  # Terminate all idle threads TODO
                 return res
             except Exception as e:
                 logger.error("Error during executing a job function: %s",
