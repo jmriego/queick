@@ -20,36 +20,18 @@ class JobQueue:
                 func: MethodType,
                 args: Union[tuple,
                             None] = None,
-                priority: int = 1,
-                retry: bool = False,
-                retry_interval: int = 10,
-                max_retry_interval: int = 600,
-                retry_on_network_available: bool = False,
-                retry_type: RETRY_TYPE = RETRY_TYPE.EXPONENTIAL,
-                max_workers: int = 10) -> dict:
+                **kwargs) -> dict:
         return self._create_request(
             func,
             args,
-            priority,
-            retry,
-            retry_interval,
-            max_retry_interval,
-            retry_on_network_available,
-            retry_type,
-            max_workers)
+            **kwargs)
 
     def enqueue_at(self,
                    start_at: Union[float, SchedulingTime],
                    func: MethodType,
                    args: Union[tuple,
                                None] = None,
-                   priority: int = 1,
-                   retry: bool = False,
-                   retry_interval: int = 10,
-                   max_retry_interval: int = 600,
-                   retry_on_network_available: bool = False,
-                   retry_type: RETRY_TYPE = RETRY_TYPE.EXPONENTIAL,
-                   max_workers: int = 10) -> dict:
+                   **kwargs) -> dict:
 
         if isinstance(start_at, SchedulingTime):
             _sa = start_at.start_at
@@ -59,64 +41,34 @@ class JobQueue:
         return self._create_request(
             func,
             args,
-            priority,
-            retry,
-            retry_interval,
-            max_retry_interval,
-            retry_on_network_available,
-            retry_type,
-            max_workers,
-            start_at=_sa)
+            start_at=_sa,
+            **kwargs)
 
     def cron(self, st: SchedulingTime,
              func: MethodType,
              args: Union[tuple,
                          None] = None,
-             priority: int = 1,
-             retry: bool = False,
-             retry_interval: int = 10,
-             max_retry_interval: int = 600,
-             retry_on_network_available: bool = False,
-             retry_type: RETRY_TYPE = RETRY_TYPE.EXPONENTIAL,
-             max_workers: int = 10) -> dict:
+             **kwargs) -> dict:
         st.validate()
         return self._create_request(
             func,
             args,
-            priority,
-            retry,
-            retry_interval,
-            max_retry_interval,
-            retry_on_network_available,
-            retry_type,
-            max_workers,
             start_at=st.start_at,
-            interval=st.interval)
+            interval=st.interval,
+            **kwargs)
 
     def _create_request(self,
                         func: MethodType,
                         args,
-                        priority: int,
-                        retry: bool,
-                        retry_interval: int,
-                        max_retry_interval: int,
-                        retry_on_network_available: bool,
-                        retry_type: RETRY_TYPE,
-                        max_workers: int,
                         start_at: Union[float,
                                         None] = None,
-                        interval: Union[float, None] = None):
+                        interval: Union[float, None] = None,
+                        **kwargs):
         func_name = func.__module__ + "." + func.__name__
         payload = {
             "func_name": func_name,
             "args": args,
-            "priority": priority,
-            "retry": retry,
-            "retry_interval": retry_interval,
-            "max_retry_interval": max_retry_interval,
-            "retry_on_network_available": retry_on_network_available,
-            "retry_type": retry_type,
-            "max_workers": max_workers
+            **kwargs
         }
         if start_at:
             payload.update({"start_at": start_at})

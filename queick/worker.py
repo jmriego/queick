@@ -29,7 +29,8 @@ class Worker:
              debug: bool = False,
              max_workers: bool = None,
              server_host: str = None,
-             server_port: int = None) -> None:
+             server_port: int = None,
+             wait: int = 0) -> None:
         loglevel = DEBUG if debug else INFO
         setup_logger(loglevel=loglevel, filepath=log_filepath)
         sys.path.append('.')
@@ -37,7 +38,7 @@ class Worker:
 
         try:
             event = Event()
-            qm = QueueManager(queue_class=Queue)
+            qm = QueueManager(queue_class=Queue, wait=wait)
             scheduler = Scheduler()
 
             jr = JobReceiver()

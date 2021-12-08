@@ -97,7 +97,7 @@ $ python -m unittest
 Integration test:
 
 ```
-$ docker build -t queick-test .
+$ docker build -t queick-test -f Dockerfile.test .
 $ docker run --rm -it queick-test:latest
 ```
 

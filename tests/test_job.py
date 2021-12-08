@@ -20,8 +20,8 @@ class TestJob(unittest.TestCase):
             j.func
 
     def test_perform(self):
-        executor = ThreadPoolExecutor(max_workers=1)
-        job = Job('tests.testfunc.func_return_arg', ('test',), executor, None, None)
-        future = job.perform()
+        job = Job('tests.testfunc.func_return_arg', ('test',))
+        with ThreadPoolExecutor(max_workers=1) as executor:
+            future = job.perform(executor)
         result = future.result()
         self.assertEqual(result, 'test')

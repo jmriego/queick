@@ -44,20 +44,6 @@ class Job:
         else:
             self.cron = False
 
-    @classmethod
-    def from_data(cls, data):
-        return cls(
-                   data['func_name'],
-                   data['args'],
-                   priority=data['priority'],
-                   retry=data['retry'],
-                   retry_interval=data['retry_interval'],
-                   retry_type=data['retry_type'],
-                   retry_on_network_available=data['retry_on_network_available'],
-                   start_at = data.get('start_at'),
-                   cron_interval = data.get('interval'),
-                   )
-
     def prepare(self, scheduler, network_watcher):
         self.scheduler = scheduler
         self.network_watcher = network_watcher

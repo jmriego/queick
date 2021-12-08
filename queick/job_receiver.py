@@ -25,7 +25,7 @@ class JobReceiver:
 
             try:
                 data = json.loads(data_bytes.decode('utf-8'))
-                qm.enqueue(Job.from_data(data))
+                qm.enqueue(Job(**data))
                 logger.info('Job received -> data: %s, addr: %s', data, addr)
                 response = json.dumps({"success": True, "error": None}).encode('utf-8')
                 conn.sendall(response)

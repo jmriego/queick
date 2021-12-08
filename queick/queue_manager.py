@@ -13,10 +13,11 @@ logger = getLogger(__name__)
 
 
 class QueueManager:
-    def __init__(self, queue_class=None):
+    def __init__(self, queue_class=None, wait=0):
         qc = queue_class or Queue
         self.queue = qc()
         self.priority_queue = PriorityQueue()
+        self.wait = wait
 
     def enqueue(self, value):
         logger.debug('[QueueManager] Job is queued: %s', value)
@@ -35,7 +36,7 @@ class QueueManager:
 
     def wait_event(self, event):
         event.wait()
-        time.sleep(5)
+        time.sleep(self.wait)
 
     def watch(self, event, scheduler, nw, max_workers=None):
         max_workers = max_workers if max_workers else os.cpu_count()
